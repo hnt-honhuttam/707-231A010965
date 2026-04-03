@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Network Memory Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1; /* Xanh Indigo */
+            --bg-color: #0f172a; /* Nền tối chuẩn Dev/IT */
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+       
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Mobile 2 cột */
+            gap: 15px;
+            max-width: 600px;
+            width: 100%;
+            perspective: 1000px; /* Khung nhìn 3D */
+        }
+
+        @media (min-width: 600px) {
+            .game-board {
+                grid-template-columns: repeat(4, 1fr); /* Desktop 4 cột */
+            }
+        }
+
+      
+        .card {
+            width: 100%;
+            aspect-ratio: 3/4;
+            position: relative;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        .card:hover .card-front {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+            border-color: var(--primary-color);
+        }
+
+        .card.flip {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: #94a3b8;
+            font-size: 2.5rem;
+        }
+
+        /* Khi lật sang mặt sau */
+        .card-back {
+            background-color: #f1f5f9;
+            transform: rotateY(180deg);
+        }
+
+        .matched .card-back {
+            background-color: #86efac; /* Đổi màu xanh lá khi ghép đúng */
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>IT Match-Up</h1>
+        <div class="stats">
+            <p>Số Lượt: <span id="moves">0</span></p>
+            <p>Đã ghép: <span id="matches">0</span>/4</p>
+        </div>
+        <button onclick="resetGame()">🔄 Chơi Lại</button>
+    </header>
+
+    <div class="game-board" id="game-board">
+        </div>
+
+    <script>
+        // Mảng chứa các icon (4 cặp)
+        const icons = ['💻', '🌐', '🔒', '📡'];
+        let cards = [...icons, ...icons]; // Nhân đôi thành 8 thẻ
+
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let moves = 0;
+        let matches = 0;
+
+        const boardElement = document.getElementById('game-board');
+        const movesElement = document.getElementById('moves');
+        const matchesElement = document.getElementById('matches');
+
+        function initGame() {
+            // Shuffle bài (Thuật toán Fisher-Yates)
+            cards.sort(() => Math.random() - 0.5);
+
+            // Render HTML
+            boardElement.innerHTML = '';
+            cards.forEach((icon, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.icon = icon;
+
+                card.innerHTML = `
+                    <div class="card-face card-front">?</div>
+                    <div class="card-face card-back">${icon}</div>
+                `;
+
+                card.addEventListener('click', flipCard);
+                boardElement.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return; // Chống double-click 1 thẻ
+
+            this.classList.add('flip');
+
+            if (!hasFlippedCard) {
+                // Lần click đầu tiên
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+            // Lần click thứ 2
+            secondCard = this;
+            updateMoves();
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.icon === secondCard.dataset.icon;
+
+            if (isMatch) {
+                disableCards();
+            } else {
+                unflipCards();
+            }
+        }
+
+        function disableCards() {
+            
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+
+            matches++;
+            matchesElement.innerText = matches;
+
+            // Check Win
+            if (matches === 4) {
+                setTimeout(() => {
+                    alert(`🎉 CHÚC MỪNG TÂM!\nHoàn thành thiết lập mạng trong ${moves} lượt!`);
+                }, 500);
+            }
+
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true; 
+            
+            setTimeout(() => {
+                firstCard.classList.remove('flip');
+                secondCard.classList.remove('flip');
+                resetBoard();
+            }, 1000); 
+        }
+
+        function updateMoves() {
+            moves++;
+            movesElement.innerText = moves;
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        function resetGame() {
+            moves = 0;
+            matches = 0;
+            movesElement.innerText = moves;
+            matchesElement.innerText = matches;
+            resetBoard();
+            initGame();
+        }
+
+       
+        initGame();
+    </script>
+
+</body>
+</html>

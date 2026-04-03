@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thi Kết Thúc HP | Lập Trình Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body class="bg-transparent text-slate-200 min-h-screen p-6 relative">
+
+    <div id="scroll-progress" class="fixed top-0 left-0 h-1.5 bg-pink-500 z-[60] w-0 rounded-r-full shadow-[0_0_15px_rgba(236,72,153,0.8)] transition-all duration-100"></div>
+    <div class="bg-animated"></div>
+
+    <div class="fixed bottom-6 right-6 z-50">
+        <a href="index.html" class="w-12 h-12 bg-pink-500 hover:bg-pink-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110 text-xl" title="Về Trang Chủ">🏠</a>
+    </div>
+
+    <nav class="flex flex-wrap gap-2 p-4 bg-slate-800/80 backdrop-blur-sm rounded-lg mb-8 justify-center font-bold text-slate-300 shadow-lg border border-slate-700">
+        <a href="index.html" class="nav-link">Trang chủ</a>
+        <a href="about.html" class="nav-link">Lý thuyết</a>
+        <a href="baitap01.html" class="nav-link">BT1 (Tìm kiếm)</a>
+        <a href="baitap02.html" class="nav-link">BT2 (Form)</a>
+        <a href="baitap03.html" class="nav-link">BT3 (Đồng hồ)</a>
+        <a href="baitap18.html" class="nav-link">BT 18</a>
+        <a href="bai19.html" class="nav-link">BT 19</a>
+        <a href="contact.html" class="nav-link">Điểm danh</a>
+    </nav>
+<div class="w-full max-w-md mx-auto bg-slate-800/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-slate-700 relative z-10">
+        <h2 class="text-2xl font-bold text-center mb-6 text-blue-400">ĐĂNG KÝ CẤP QUYỀN ADMIN</h2>
+        <form id="regForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-slate-300">Họ và tên</label>
+                <input type="text" id="name" required class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded focus:border-blue-500 focus:outline-none text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-slate-300">Email nội bộ</label>
+                <input type="email" id="email" required class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded focus:border-blue-500 focus:outline-none text-white">
+                <p id="emailError" class="text-red-400 text-xs mt-1 hidden">Email không hợp lệ!</p>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-slate-300">Mật khẩu (Root Password)</label>
+                <input type="password" id="password" required class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded focus:border-blue-500 focus:outline-none text-white">
+                <p id="pwError" class="text-red-400 text-xs mt-1 hidden">Mật khẩu phải >= 8 ký tự, gồm Hoa, Thường và Số!</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="terms" required class="w-4 h-4 cursor-pointer">
+                <label for="terms" class="text-sm cursor-pointer select-none text-slate-300">Đồng ý tuân thủ Policy hệ thống</label>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded transition-colors">CẤP QUYỀN NGAY</button>
+        </form>
+        <div id="successMsg" class="hidden mt-4 p-3 bg-green-900/50 border border-green-500 text-green-400 rounded text-center">✅ Đăng ký thành công! Đã lưu vào LocalStorage.</div>
+        
+        <div class="mt-6 text-xs text-slate-400 bg-slate-900 p-3 rounded">
+            <strong>💡 Logic Tư duy:</strong> Dùng <code>e.preventDefault()</code> cản load trang. Regex ép buộc độ khó Password. <strong>Bảo mật:</strong> Tuyệt đối không lưu Password dạng thô vào LocalStorage để chống lộ dữ liệu cục bộ (Local Attack).
+        </div>
+    </div>
+</body>
+</html>
